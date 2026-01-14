@@ -1,13 +1,19 @@
 import { useState } from 'react'
 import Head from 'next/head'
+import CryptoJS from 'crypto-js'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
   const [amount, setAmount] = useState<string>('')
   const [productId, setProductId] = useState<string>('')
 
-  const generateProductId = () => {
-    return `PROD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  const generateTransactionUuid = () => {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  const generateSignature = (message: string, secretKey: string): string => {
+    const hash = CryptoJS.HmacSHA256(message, secretKey)
+    return CryptoJS.enc.Base64.stringify(hash)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -18,28 +24,44 @@ export default function Home() {
       return
     }
     
-    const newProductId = generateProductId()
-    setProductId(newProductId)
+    const transactionUuid = generateTransactionUuid()
+    setProductId(transactionUuid)
+    
+    // eSewa API parameters according to documentation
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
+    const productCode = process.env.NEXT_PUBLIC_ESEWA_MERCHANT_CODE || 'EPAYTEST'
+    const secretKey = process.env.NEXT_PUBLIC_ESEWA_SECRET_KEY || '8gBm/:&EnhH.1/q('
+    
+    // Calculate amounts (for demo: tax_amount = 0, service charge = 0, delivery charge = 0)
+    const taxAmount = '0'
+    const productServiceCharge = '0'
+    const productDeliveryCharge = '0'
+    const totalAmount = amountNum.toString()
+    
+    // Create signature message: total_amount,transaction_uuid,product_code
+    const signedFieldNames = 'total_amount,transaction_uuid,product_code'
+    const signatureMessage = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`
+    const signature = generateSignature(signatureMessage, secretKey)
     
     // Create and submit form to eSewa
     const form = document.createElement('form')
     form.method = 'POST'
-    // Use the correct eSewa sandbox URL
     const esewaUrl = process.env.NEXT_PUBLIC_ESEWA_SANDBOX_URL || 'https://rc-epay.esewa.com.np/api/epay/main/v2/form'
     form.action = esewaUrl
     
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
-    
+    // eSewa API v2 required parameters
     const params = {
-      amt: amount,
-      psc: '0',
-      pdc: '0',
-      txAmt: '0',
-      tAmt: amount,
-      pid: newProductId,
-      scd: process.env.NEXT_PUBLIC_ESEWA_MERCHANT_CODE || 'EPAYTEST',
-      su: `${appUrl}/payment/success`,
-      fu: `${appUrl}/payment/failure`,
+      amount: totalAmount,
+      tax_amount: taxAmount,
+      total_amount: totalAmount,
+      transaction_uuid: transactionUuid,
+      product_code: productCode,
+      product_service_charge: productServiceCharge,
+      product_delivery_charge: productDeliveryCharge,
+      success_url: `${appUrl}/payment/success`,
+      failure_url: `${appUrl}/payment/failure`,
+      signed_field_names: signedFieldNames,
+      signature: signature,
     }
     
     Object.entries(params).forEach(([key, value]) => {
