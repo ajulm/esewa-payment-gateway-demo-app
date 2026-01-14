@@ -9,6 +9,7 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_ESEWA_MERCHANT_CODE=${NEXT_PUBLIC_ESEWA_MERCHANT_CODE:-EPAYTEST}
+      - NEXT_PUBLIC_ESEWA_SECRET_KEY=${NEXT_PUBLIC_ESEWA_SECRET_KEY:-8gBm/:&EnhH.1/q(}
       - NEXT_PUBLIC_ESEWA_SANDBOX_URL=${NEXT_PUBLIC_ESEWA_SANDBOX_URL:-https://rc-epay.esewa.com.np/api/epay/main/v2/form}
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       # Enable file watching for hot reload in Docker
