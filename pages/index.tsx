@@ -12,8 +12,10 @@ export default function Home() {
   }
 
   const generateSignature = (message: string, secretKey: string): string => {
+    // Generate HMAC SHA256 hash
     const hash = CryptoJS.HmacSHA256(message, secretKey)
-    return CryptoJS.enc.Base64.stringify(hash)
+    // Convert to Base64 string
+    return hash.toString(CryptoJS.enc.Base64)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -39,9 +41,13 @@ export default function Home() {
     const totalAmount = amountNum.toString()
     
     // Create signature message: total_amount,transaction_uuid,product_code
-    // Format: total_amount=100,transaction_uuid=11-201-13,product_code=EPAYTEST
+    // Format must be exactly: total_amount=100,transaction_uuid=11-201-13,product_code=EPAYTEST
+    // Parameters must be in the exact order specified in signed_field_names
     const signedFieldNames = 'total_amount,transaction_uuid,product_code'
+    // Build signature message in the exact order: total_amount,transaction_uuid,product_code
     const signatureMessage = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`
+    
+    // Generate signature using HMAC SHA256 with Base64 encoding
     const signature = generateSignature(signatureMessage, secretKey)
     
     // Debug: verify signature generation
