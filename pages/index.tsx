@@ -46,8 +46,14 @@ export default function Home() {
     // Create and submit form to eSewa
     const form = document.createElement('form')
     form.method = 'POST'
-    const esewaUrl = process.env.NEXT_PUBLIC_ESEWA_SANDBOX_URL || 'https://rc-epay.esewa.com.np/api/epay/main/v2/form'
+    // Use the correct eSewa sandbox URL (hardcoded to ensure it works)
+    const esewaUrl = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form'
     form.action = esewaUrl
+    
+    // Debug: log the URL and parameters
+    console.log('eSewa URL:', esewaUrl)
+    console.log('Signature Message:', signatureMessage)
+    console.log('Signature:', signature)
     
     // eSewa API v2 required parameters
     const params = {
