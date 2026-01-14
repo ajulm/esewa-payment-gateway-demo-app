@@ -32,9 +32,12 @@ The app demonstrates how to initiate a payment, handle success/failure redirects
 Create a `.env` file (or copy from `.env.example`) with the following variables:
 ```env
 NEXT_PUBLIC_ESEWA_MERCHANT_CODE=EPAYTEST
+NEXT_PUBLIC_ESEWA_SECRET_KEY=8gBm/:&EnhH.1/q(
 NEXT_PUBLIC_ESEWA_SANDBOX_URL=https://rc-epay.esewa.com.np/api/epay/main/v2/form
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+**Note:** The secret key is for UAT/testing environment. For production, you'll receive a different secret key from eSewa.
 
 ### Running with Docker
 Build and run the app in development mode with hot reload:
@@ -94,13 +97,20 @@ docker-compose logs -f
 
 ---
 
-## 🔐 eSewa Parameters Used
-- `amt` – Amount
-- `tAmt` – Total amount
-- `pid` – Product / Order ID
-- `scd` – Merchant code
-- `su` – Success URL
-- `fu` – Failure URL
+## 🔐 eSewa API v2 Parameters Used
+- `amount` – Payment amount
+- `tax_amount` – Tax amount (0 for demo)
+- `total_amount` – Total amount including tax
+- `transaction_uuid` – Unique transaction identifier
+- `product_code` – Merchant/product code (EPAYTEST for testing)
+- `product_service_charge` – Service charge (0 for demo)
+- `product_delivery_charge` – Delivery charge (0 for demo)
+- `success_url` – URL to redirect on successful payment
+- `failure_url` – URL to redirect on failed payment
+- `signed_field_names` – Comma-separated list of fields used in signature
+- `signature` – HMAC SHA256 signature (Base64 encoded)
+
+**Signature Generation:** The signature is generated using HMAC SHA256 algorithm with the secret key. The signed fields are: `total_amount,transaction_uuid,product_code`
 
 ---
 
