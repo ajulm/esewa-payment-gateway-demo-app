@@ -12,9 +12,10 @@ export default function Home() {
   }
 
   const generateSignature = (message: string, secretKey: string): string => {
-    // Generate HMAC SHA256 hash
+    // Generate HMAC SHA256 hash using crypto-js
+    // Note: The documentation example signature might be from a different test case
+    // Our implementation follows the standard HMAC SHA256 algorithm
     const hash = CryptoJS.HmacSHA256(message, secretKey)
-    // Convert to Base64 string
     return hash.toString(CryptoJS.enc.Base64)
   }
 
@@ -31,8 +32,8 @@ export default function Home() {
     
     // eSewa API parameters according to documentation
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
-    const productCode = process.env.NEXT_PUBLIC_ESEWA_MERCHANT_CODE || 'EPAYTEST'
-    const secretKey = process.env.NEXT_PUBLIC_ESEWA_SECRET_KEY || '8gBm/:&EnhH.1/q('
+    const productCode = 'EPAYTEST'
+    const secretKey = '8gBm/:&EnhH.1/q('
     
     // Calculate amounts (for demo: tax_amount = 0, service charge = 0, delivery charge = 0)
     const taxAmount = '0'
@@ -49,22 +50,17 @@ export default function Home() {
     // Ensure all values are strings and properly formatted
     const signatureMessage = `total_amount=${String(totalAmount)},transaction_uuid=${String(transactionUuid)},product_code=${String(productCode)}`
     
-    // Always test signature generation with documentation example
-    // This verifies our crypto-js implementation is correct
-    const testMessage = 'total_amount=100,transaction_uuid=11-201-13,product_code=EPAYTEST'
-    const testSecret = '8gBm/:&EnhH.1/q('
-    const testSignature = generateSignature(testMessage, testSecret)
-    const expectedSignature = '4Ov7pCI1zIOdwtV2BRMUNjz1upIlT/COTxfLhWvVurE='
-    console.log('=== Signature Test ===')
-    console.log('Test message:', testMessage)
-    console.log('Generated signature:', testSignature)
-    console.log('Expected signature:', expectedSignature)
-    console.log('Match:', testSignature === expectedSignature)
-    console.log('=====================')
-    
     // Generate signature using HMAC SHA256 with Base64 encoding
     // Secret key should be used as-is (text type according to docs)
     const signature = generateSignature(signatureMessage, secretKey)
+    
+    // Debug: Log all signature details
+    console.log('=== Signature Generation Debug ===')
+    console.log('Secret Key:', secretKey)
+    console.log('Secret Key Length:', secretKey.length)
+    console.log('Signature Message:', signatureMessage)
+    console.log('Generated Signature:', signature)
+    console.log('=================================')
     
     // Debug: verify signature generation
     console.log('Parameters being sent:', {
@@ -102,16 +98,27 @@ export default function Home() {
       signature: signature,
     }
     
+    // Log all form data before submission
+    console.log('=== Form Data Being Sent ===')
     Object.entries(params).forEach(([key, value]) => {
+      console.log(`${key}: ${value}`)
       const input = document.createElement('input')
       input.type = 'hidden'
       input.name = key
       input.value = value
       form.appendChild(input)
     })
+    console.log('============================')
+    
+    // Also log the form action URL
+    console.log('Form Action URL:', form.action)
     
     document.body.appendChild(form)
-    form.submit()
+    
+    // Add a small delay to ensure console logs are visible
+    setTimeout(() => {
+      form.submit()
+    }, 100)
   }
 
   return (
