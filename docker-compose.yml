@@ -1,0 +1,24 @@
+services:
+  nextjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: esewa-payment-demo
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_ESEWA_MERCHANT_CODE=${NEXT_PUBLIC_ESEWA_MERCHANT_CODE:-EPAYTEST}
+      - NEXT_PUBLIC_ESEWA_SANDBOX_URL=${NEXT_PUBLIC_ESEWA_SANDBOX_URL:-https://rc-epay.esewa.com.np/api/epay/main/v2/form}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      # Enable file watching for hot reload in Docker
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      # Mount source code for hot reload
+      - .:/app
+      # Exclude node_modules and .next from host to use container versions
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    command: npm run dev

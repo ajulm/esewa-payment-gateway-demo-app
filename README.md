@@ -18,6 +18,46 @@ The app demonstrates how to initiate a payment, handle success/failure redirects
 - Next.js
 - React
 - Node.js
+- Docker & Docker Compose
+
+---
+
+## 🐳 Docker Setup
+
+### Prerequisites
+- Docker
+- Docker Compose
+
+### Environment Variables
+Create a `.env` file (or copy from `.env.example`) with the following variables:
+```env
+NEXT_PUBLIC_ESEWA_MERCHANT_CODE=EPAYTEST
+NEXT_PUBLIC_ESEWA_SANDBOX_URL=https://rc-epay.esewa.com.np/api/epay/main/v2/form
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### Running with Docker
+Build and run the app in development mode with hot reload:
+```bash
+docker-compose up --build
+```
+
+Or run in detached mode:
+```bash
+docker-compose up -d --build
+```
+
+The app will be available at `http://localhost:3000` with hot reload enabled.
+
+### Stop Containers
+```bash
+docker-compose down
+```
+
+### View Logs
+```bash
+docker-compose logs -f
+```
 
 ---
 
