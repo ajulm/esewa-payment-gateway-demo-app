@@ -39,9 +39,19 @@ export default function Home() {
     const totalAmount = amountNum.toString()
     
     // Create signature message: total_amount,transaction_uuid,product_code
+    // Format: total_amount=100,transaction_uuid=11-201-13,product_code=EPAYTEST
     const signedFieldNames = 'total_amount,transaction_uuid,product_code'
     const signatureMessage = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`
     const signature = generateSignature(signatureMessage, secretKey)
+    
+    // Debug: verify signature generation
+    console.log('Parameters being sent:', {
+      total_amount: totalAmount,
+      transaction_uuid: transactionUuid,
+      product_code: productCode,
+      signature_message: signatureMessage,
+      signature: signature
+    })
     
     // Create and submit form to eSewa
     const form = document.createElement('form')
