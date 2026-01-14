@@ -12,8 +12,9 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!amount || parseFloat(amount) <= 0) {
-      alert('Please enter a valid amount')
+    const amountNum = parseInt(amount, 10)
+    if (!amount || isNaN(amountNum) || amountNum <= 0) {
+      alert('Please enter a valid integer amount')
       return
     }
     
@@ -81,7 +82,7 @@ export default function Home() {
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="Enter amount"
                 min="1"
-                step="0.01"
+                step="1"
                 required
                 className={styles.input}
               />
