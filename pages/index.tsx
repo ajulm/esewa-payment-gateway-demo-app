@@ -44,11 +44,23 @@ export default function Home() {
     // Format must be exactly: total_amount=100,transaction_uuid=11-201-13,product_code=EPAYTEST
     // Parameters must be in the exact order specified in signed_field_names
     const signedFieldNames = 'total_amount,transaction_uuid,product_code'
+    
     // Build signature message in the exact order: total_amount,transaction_uuid,product_code
-    const signatureMessage = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`
+    // Ensure all values are strings and properly formatted
+    const signatureMessage = `total_amount=${String(totalAmount)},transaction_uuid=${String(transactionUuid)},product_code=${String(productCode)}`
     
     // Generate signature using HMAC SHA256 with Base64 encoding
+    // Secret key should be used as-is (text type according to docs)
     const signature = generateSignature(signatureMessage, secretKey)
+    
+    // Test signature with documentation example (for debugging)
+    // Expected: total_amount=100,transaction_uuid=11-201-13,product_code=EPAYTEST
+    // Secret: 8gBm/:&EnhH.1/q(
+    // Expected signature: 4Ov7pCI1zIOdwtV2BRMUNjz1upIlT/COTxfLhWvVurE=
+    if (totalAmount === '100' && transactionUuid === '11-201-13' && productCode === 'EPAYTEST') {
+      const testSig = generateSignature('total_amount=100,transaction_uuid=11-201-13,product_code=EPAYTEST', '8gBm/:&EnhH.1/q(')
+      console.log('Test signature:', testSig, 'Expected: 4Ov7pCI1zIOdwtV2BRMUNjz1upIlT/COTxfLhWvVurE=')
+    }
     
     // Debug: verify signature generation
     console.log('Parameters being sent:', {
